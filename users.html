@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .user-card {
+            font-size: 20px;
+            color: rgb(17, 25, 1);
+            border: 1px solid  rgb(17, 25, 1);
+        background-color: white;
+        }
+    .changeBG {
+        background-color: aqua;
+        }
+    </style>
+    <title>Gallery users</title>
+</head>
+<body>
+    <div id="users-container"></div>
+    <template id="user-template">
+        <div class="user-card">
+            <h3 class="user-name">{{name}}</h3>
+            <p class="user-age">{{age}}</p>
+            <button class="highlinght-btn">Підсвітити</button>
+        </div>
+    </template>
+    <script>
+        const usersCont = document.querySelector('#users-container');
+const template = document.querySelector('#user-template');
+
+class User {
+    constructor(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    createUser(element){
+        const clone = template.content.cloneNode(true);
+
+        clone.querySelector('.user-name').textContent = this.name;
+        clone.querySelector('.user-age').textContent = this.age;
+
+        const userCard = clone.querySelector('.user-card');
+        const styleCardBtn = clone.querySelector('.highlinght-btn');
+        
+        styleCardBtn.addEventListener("click", function () {
+            userCard.classList.toggle('changeBG');
+        });
+
+        element.appendChild(clone);
+    }
+}
+const users = [new User ("Alex", 5), 
+               new User ("Yarik", 10)];
+
+users.forEach(user => user.createUser(usersCont));
+
+
+    </script>
+</body>
+</html>

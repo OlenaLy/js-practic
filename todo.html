@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do Manager</title>
+    <style>
+        h1 {
+            text-align: center;
+            color: blue;
+        }
+        #input-form-task{
+            text-align: center;
+            font-size: 20px;
+        }
+        #todo-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            /* justify-content: space-around; */
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        #card-task{
+            width: 200px;
+            padding: 10px;
+            border: 1px solid blue;
+            border-radius: 5px;
+        }
+        .btn {
+            background-color: rgb(96, 115, 165);
+            border-radius: 5px;
+            border-color: blue;
+            cursor: pointer;
+        }
+        .done {
+            background-color: lightblue;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Менеджер задач</h1>
+    <form id="input-form-task">
+        <input type="text" name="" id="input-task">
+        <select name="category" id="category-input">
+            <option value="Work">Робота</option>
+            <option value="Home">Дім</option>
+            <option value="study">Навчання</option>
+        </select>
+        <select name="priority" id="priority-input">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+        </select>
+        <button type="button" class="btn" id="add-task">Додати задачу</button>
+    </form>
+    <div id="todo-container"></div>
+
+    <footer id="footer">
+        <p>Кількість виконаний задач: <span id="count-ok-task"></span>
+        </p>
+        <button type="button" id="sort-btn" class="btn">Сортувати</button>
+    </footer>
+
+    <template id="card-template">
+        <div id="card-task">
+            <h3 id="title">{{title}}</h3>
+            <p id="category">{{category}}</p>
+            <p id="priority">{{priority}}</p>
+            <button type="button" id="complete-btn" class="btn">Завершити</button>
+            <button type="button" id="del-btn" class="btn">Видалити</button>
+        </div>
+    </template>
+    <script>
+        const todoContainer =  document.querySelector('#todo-container');
+        const cardTemplate = document.querySelector('#card-template');
+        const addTask = document.querySelector('#add-task');
+
+        const inputTask = document.querySelector('#input-task');
+        const categoryInput = document.querySelector('#category-input');
+        const priorityInput = document.querySelector('#priority-input');
+        const sortBtn = document.querySelector('#sort-btn');
+
+        let countCompletedTask = 0;
+
+        const priorityMap = {
+                    Low: 1,
+                    Medium: 2,
+                    High: 3   
+                };
+
+        class Card {
+            constructor(title, category, priority){
+                this.title= title;
+                this.category = category;
+                this.priority= priority;
+            }
+
+            render (element) {
+                let isDone = false;
+                const clone = cardTemplate.content.cloneNode(true);
+
+                clone.querySelector('#title').textContent = this.title;
+                clone.querySelector('#category').textContent = this.category;
+                clone.querySelector('#priority').textContent = this.priority;
+
+                const cardTask = clone.querySelector('#card-task');
+                const completeBtn = clone.querySelector('#complete-btn');
+                const delBtn = clone.querySelector('#del-btn');
+                
+                //видалення
+                delBtn.addEventListener('click', () => {
+                    cardTask.remove();
+                });
+                
+                //завершення
+                completeBtn.addEventListener('click', () => {
+                    if(!isDone){
+                        isDone = true;
+                        cardTask.classList.toggle('done');
+                        countCompletedTask++;
+                        countOkInputTask.textContent = countCompletedTask;
+                        completeBtn.disabled= true;
+                    }
+                });
+
+                //підсвітка пріоритету
+                if (this.priority === 'High') {
+                    cardTask.style.borderColor = 'red';
+                }
+                element.appendChild(clone);
+            }
+        }
+        
+        const tasks = [new Card('Вивчити класи', 'Навчання', 'High'),
+                    new Card('Помити посуд', 'Дім', 'Low'),
+                    new Card('Наповнити Linkidin', 'Робота', 'Medium')
+        ]
+
+        //рендер списку
+        function renderAllTask() {
+            todoContainer.innerHTML = ""; //очищаємо екран
+            tasks.forEach(task => task.render(todoContainer));
+        }
+
+        renderAllTask();
+
+        //додавання нової задачі
+        addTask.addEventListener('click', (event) => {
+            event.preventDefault();     
+
+            const newTask = new Card(
+                inputTask.value, 
+                categoryInput.value, 
+                priorityInput.value
+            );
+            tasks.push(newTask);
+            renderAllTask();
+        });
+        
+        //сортування
+        sortBtn.addEventListener('click', ()=>{
+            tasks.sort((a, b) => {
+                return priorityMap[b.priority] - priorityMap[a.priority];
+            });
+            renderAllTask();
+        })
+        
+        const countOkInputTask = document.querySelector('#count-ok-task');
+        countOkInputTask.textContent = countCompletedTask; 
+    </script>
+</body>
+</html>
